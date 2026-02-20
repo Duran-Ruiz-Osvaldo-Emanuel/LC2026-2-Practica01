@@ -30,4 +30,5 @@ En esta sección deben eliminar esta línea de texto, borrar la leyenda "Integra
 
 ## Comentarios
 
-Modificamos la version en el archivo .cabal para intentar hacer las pruebas
+Modificamos la version en el archivo .cabal para intentar hacer las pruebas pero no nos dejo hacerlas,
+el .hs compila y se ejecuta correctamente pero tuvimos problemas para correr el .cabal
