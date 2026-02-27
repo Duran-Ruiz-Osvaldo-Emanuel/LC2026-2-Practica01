@@ -1,0 +1,97 @@
+module Practica02 where
+
+--Sintaxis de la logica proposicional
+data Prop = Var String | Cons Bool | Not Prop
+            | And Prop Prop | Or Prop Prop
+            | Impl Prop Prop | Syss Prop Prop
+            deriving (Eq)
+
+instance Show Prop where 
+                    show (Cons True) = "⊤"
+                    show (Cons False) = "⊥"
+                    show (Var p) = p
+                    show (Not p) = "¬" ++ show p
+                    show (Or p q) = "(" ++ show p ++ " ∨ " ++ show q ++ ")"
+                    show (And p q) = "(" ++ show p ++ " ∧ " ++ show q ++ ")"
+                    show (Impl p q) = "(" ++ show p ++ " → " ++ show q ++ ")"
+                    show (Syss p q) = "(" ++ show p ++ " ↔ " ++ show q ++ ")"
+
+
+p, q, r, s, t, u :: Prop
+p = Var "p"
+q = Var "q"
+r = Var "r"
+s = Var "s"
+t = Var "t"
+u = Var "u"
+
+type Estado = [String]
+
+--EJERCICIOS
+
+--Ejercicio 1
+variables :: Prop -> [String]
+variables (Var p) = [p]
+variables (Cons _) = []
+variables (Not f1) = myNub(variables f1)
+variables (And f1 f2) = myNub(variables f1 ++ variables f2)
+variables (Or f1 f2) = myNub(variables f1 ++ variables f2)
+variables (Impl f1 f2) = myNub(variables f1 ++ variables f2)
+variables (Syss f1 f2) = myNub(variables f1 ++ variables f2)
+
+
+--Ejercicio 2
+interpretacion :: Prop -> Estado -> Bool
+interpretacion (Var p) estado = p `elem` estado
+interpretacion (Cons a) _ = a
+interpretacion (Not f1) estado = not (interpretacion f1 estado)
+interpretacion (And f1 f2) estado = interpretacion f1 estado && interpretacion f2 estado
+interpretacion (Or f1 f2) estado = interpretacion f1 estado || interpretacion f2 estado
+interpretacion (Impl f1 f2) estado = not (interpretacion f1 estado) || interpretacion f2 estado
+interpretacion (Syss f1 f2) estado = not (interpretacion f1 estado) || interpretacion f2 estado && not (interpretacion f2 estado) || interpretacion f1 estado
+
+
+--Ejercicio 3
+estadosPosibles :: Prop -> [Estado]
+estadosPosibles f1 = conjPotencia (variables f1)
+
+--Ejercicio 4
+modelos :: Prop -> [Estado]
+--Funcion lambda que genera todas las combinaciones posibles y para cada estado evalua la interpretacion de la Prop
+modelos p = myFilter(\estado -> interpretacion p estado)
+            (estadosPosibles p)
+
+--Ejercicio 5
+sonEquivalentes :: Prop -> Prop -> Bool
+sonEquivalentes = undefined
+
+--Ejercicio 6 
+tautologia :: Prop -> Bool
+tautologia = undefined
+
+--Ejercicio 7
+contradiccion :: Prop -> Bool
+contradiccion = undefined
+
+--Ejercicio 8
+consecuenciaLogica :: [Prop] -> Prop -> Bool
+consecuenciaLogica = undefined
+
+
+--Funcion auxiliar
+conjPotencia :: [a] -> [[a]]
+conjPotencia [] = [[]]
+conjPotencia (x:xs) = [(x:ys) | ys <- conjPotencia xs] ++ conjPotencia xs
+
+--Funcion auxiliar para evitar contar repetidos
+myNub :: Eq a => [a] -> [a]
+myNub []     = []
+myNub (x:xs) = x : myNub (myFilter (/= x) xs)
+
+--Funcion auxiliar para filtrar los elementos repetidos
+myFilter :: (a -> Bool) -> [a] -> [a]
+myFilter _ [] = []
+myFilter p (x:xs)
+
+    | p x       = x : myFilter p xs
+    | otherwise = myFilter p xs
